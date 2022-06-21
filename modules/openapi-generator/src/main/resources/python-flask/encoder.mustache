@@ -17,4 +17,7 @@ class JSONEncoder(FlaskJSONEncoder):
                 attr = o.attribute_map[attr]
                 dikt[attr] = value
             return dikt
+        elif isinstance(o, bytes):
+            return str(o, encoding='utf-8')
+
         return FlaskJSONEncoder.default(self, o)
