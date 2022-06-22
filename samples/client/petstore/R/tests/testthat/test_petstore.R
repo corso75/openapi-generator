@@ -139,6 +139,29 @@ test_that("Tests validateJSON", {
   
 })
 
+# test object with special item names: self, private, super
+test_that("Tests oneOf", {
+  special_json <-
+  '{"self": 123, "private": "red", "super": "something"}'
+
+  # test fromJSON
+  special <- Special$new()$fromJSON(special_json)
+  expect_equal(special$item_self, 123)
+  expect_equal(special$item_private, "red")
+  expect_equal(special$item_super, "something")
+
+  # test toJSONString 
+  expect_true(grepl('"private"', special$toJSONString()))
+  expect_true(grepl('"self"', special$toJSONString()))
+  expect_true(grepl('"super"', special$toJSONString()))
+
+  # round trip test
+  s1 <- Special$new()$fromJSONString(special_json)
+  s2 <- Special$new()$fromJSONString(s1$toJSONString())
+  expect_equal(s1, s2)
+
+})
+
 test_that("Tests oneOf", {
   basque_pig_json <-
   '{"className": "BasquePig", "color": "red"}'
@@ -153,8 +176,8 @@ test_that("Tests oneOf", {
     {"Name" : "Ada", "Occupation" : "Engineer"}
   ]'
 
-  original_danish_pig = DanishPig$new()$fromJSON(danish_pig_json)
-  original_basque_pig = BasquePig$new()$fromJSON(basque_pig_json)
+  original_danish_pig <- DanishPig$new()$fromJSON(danish_pig_json)
+  original_basque_pig <- BasquePig$new()$fromJSON(basque_pig_json)
 
   # test fromJSON, actual_tpye, actual_instance
   pig <- Pig$new()
@@ -181,6 +204,17 @@ test_that("Tests oneOf", {
   expect_error(pig$fromJSON('{}'), 'No match found when deserializing the payload into Pig with oneOf schemas BasquePig, DanishPig. Details:  The JSON input ` \\{\\} ` is invalid for BasquePig: the required field `className` is missing\\., The JSON input ` \\{\\} ` is invalid for DanishPig: the required field `className` is missing\\.')
   expect_error(pig$validateJSON('{}'), 'No match found when deserializing the payload into Pig with oneOf schemas BasquePig, DanishPig. Details:  The JSON input ` \\{\\} ` is invalid for BasquePig: the required field `className` is missing\\., The JSON input ` \\{\\} ` is invalid for DanishPig: the required field `className` is missing\\.')
 
+  # class name test
+  expect_equal(get(class(basque_pig$actual_instance)[[1]], pos = -1)$classname, "BasquePig")
+
+  # test contructors
+  pig2 <- Pig$new(instance = basque_pig$actual_instance)
+  expect_equal(pig2$actual_type, "BasquePig")
+  expect_equal(pig2$actual_instance$color, "red")
+  expect_equal(pig2$actual_instance$className, "BasquePig")
+  expect_equal(pig2$toJSON(), original_basque_pig$toJSONString())
+  
+  expect_error(Pig$new(instance = basque_pig), 'Failed to initialize Pig with oneOf schemas BasquePig, DanishPig. Provided class name:  Pig')
 })
 
 test_that("Tests anyOf", {
@@ -197,8 +231,8 @@ test_that("Tests anyOf", {
     {"Name" : "Ada", "Occupation" : "Engineer"}
   ]'
 
-  original_danish_pig = DanishPig$new()$fromJSON(danish_pig_json)
-  original_basque_pig = BasquePig$new()$fromJSON(basque_pig_json)
+  original_danish_pig <- DanishPig$new()$fromJSON(danish_pig_json)
+  original_basque_pig <- BasquePig$new()$fromJSON(basque_pig_json)
 
   # test fromJSON, actual_tpye, actual_instance
   pig <- AnyOfPig$new()
