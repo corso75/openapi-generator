@@ -8,17 +8,12 @@
 
 #' @docType class
 #' @title Special
-#'
 #' @description Special Class
-#'
 #' @format An \code{R6Class} generator object
-#'
 #' @field item_self  integer [optional]
-#'
 #' @field item_private  character [optional]
-#'
 #' @field item_super  character [optional]
-#'
+#' @field empty_string  character [optional]
 #' @importFrom R6 R6Class
 #' @importFrom jsonlite fromJSON toJSON
 #' @export
@@ -28,8 +23,20 @@ Special <- R6::R6Class(
     `item_self` = NULL,
     `item_private` = NULL,
     `item_super` = NULL,
+    `empty_string` = NULL,
+    #' Initialize a new Special class.
+    #'
+    #' @description
+    #' Initialize a new Special class.
+    #'
+    #' @param item_self item_self
+    #' @param item_private item_private
+    #' @param item_super item_super
+    #' @param empty_string empty_string
+    #' @param ... Other optional arguments.
+    #' @export
     initialize = function(
-        `item_self`=NULL, `item_private`=NULL, `item_super`=NULL, ...
+        `item_self`=NULL, `item_private`=NULL, `item_super`=NULL, `empty_string`=NULL, ...
     ) {
       if (!is.null(`item_self`)) {
         stopifnot(is.numeric(`item_self`), length(`item_self`) == 1)
@@ -43,7 +50,18 @@ Special <- R6::R6Class(
         stopifnot(is.character(`item_super`), length(`item_super`) == 1)
         self$`item_super` <- `item_super`
       }
+      if (!is.null(`empty_string`)) {
+        stopifnot(is.character(`empty_string`), length(`empty_string`) == 1)
+        self$`empty_string` <- `empty_string`
+      }
     },
+    #' To JSON string
+    #'
+    #' @description
+    #' To JSON String
+    #'
+    #' @return Special in JSON format
+    #' @export
     toJSON = function() {
       SpecialObject <- list()
       if (!is.null(self$`item_self`)) {
@@ -58,22 +76,44 @@ Special <- R6::R6Class(
         SpecialObject[['super']] <-
           self$`item_super`
       }
+      if (!is.null(self$`empty_string`)) {
+        SpecialObject[['empty_string']] <-
+          self$`empty_string`
+      }
 
       SpecialObject
     },
-    fromJSON = function(SpecialJson) {
-      SpecialObject <- jsonlite::fromJSON(SpecialJson)
-      if (!is.null(SpecialObject$`self`)) {
-        self$`item_self` <- SpecialObject$`self`
+    #' Deserialize JSON string into an instance of Special
+    #'
+    #' @description
+    #' Deserialize JSON string into an instance of Special
+    #'
+    #' @param input_json the JSON input
+    #' @return the instance of Special
+    #' @export
+    fromJSON = function(input_json) {
+      this_object <- jsonlite::fromJSON(input_json)
+      if (!is.null(this_object$`self`)) {
+        self$`item_self` <- this_object$`self`
       }
-      if (!is.null(SpecialObject$`private`)) {
-        self$`item_private` <- SpecialObject$`private`
+      if (!is.null(this_object$`private`)) {
+        self$`item_private` <- this_object$`private`
       }
-      if (!is.null(SpecialObject$`super`)) {
-        self$`item_super` <- SpecialObject$`super`
+      if (!is.null(this_object$`super`)) {
+        self$`item_super` <- this_object$`super`
+      }
+      if (!is.null(this_object$`empty_string`)) {
+        self$`empty_string` <- this_object$`empty_string`
       }
       self
     },
+    #' To JSON string
+    #'
+    #' @description
+    #' To JSON String
+    #'
+    #' @return Special in JSON format
+    #' @export
     toJSONString = function() {
       jsoncontent <- c(
         if (!is.null(self$`item_self`)) {
@@ -96,22 +136,54 @@ Special <- R6::R6Class(
           "%s"
                 ',
         self$`item_super`
+        )},
+        if (!is.null(self$`empty_string`)) {
+        sprintf(
+        '"empty_string":
+          "%s"
+                ',
+        self$`empty_string`
         )}
       )
       jsoncontent <- paste(jsoncontent, collapse = ",")
-      paste('{', jsoncontent, '}', sep = "")
+      jsonlite::minify(paste('{', jsoncontent, '}', sep = ""))
     },
-    fromJSONString = function(SpecialJson) {
-      SpecialObject <- jsonlite::fromJSON(SpecialJson)
-      self$`item_self` <- SpecialObject$`item_self`
-      self$`item_private` <- SpecialObject$`item_private`
-      self$`item_super` <- SpecialObject$`item_super`
+    #' Deserialize JSON string into an instance of Special
+    #'
+    #' @description
+    #' Deserialize JSON string into an instance of Special
+    #'
+    #' @param input_json the JSON input
+    #' @return the instance of Special
+    #' @export
+    fromJSONString = function(input_json) {
+      this_object <- jsonlite::fromJSON(input_json)
+      self$`item_self` <- this_object$`item_self`
+      self$`item_private` <- this_object$`item_private`
+      self$`item_super` <- this_object$`item_super`
+      self$`empty_string` <- this_object$`empty_string`
       self
     },
+    #' Validate JSON input with respect to Special
+    #'
+    #' @description
+    #' Validate JSON input with respect to Special and throw an exception if invalid
+    #'
+    #' @param input the JSON input
+    #' @export
     validateJSON = function(input) {
       input_json <- jsonlite::fromJSON(input)
+    },
+    #' To string (JSON format)
+    #'
+    #' @description
+    #' To string (JSON format)
+    #'
+    #' @return String representation of Special
+    #' @export
+    toString = function() {
+      self$toJSONString()
     }
-
   )
 )
 

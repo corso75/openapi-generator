@@ -8,17 +8,11 @@
 
 #' @docType class
 #' @title Cat
-#'
 #' @description Cat Class
-#'
 #' @format An \code{R6Class} generator object
-#'
 #' @field className  character 
-#'
 #' @field color  character [optional]
-#'
 #' @field declawed  character [optional]
-#'
 #' @importFrom R6 R6Class
 #' @importFrom jsonlite fromJSON toJSON
 #' @export
@@ -29,6 +23,16 @@ Cat <- R6::R6Class(
     `className` = NULL,
     `color` = NULL,
     `declawed` = NULL,
+    #' Initialize a new Cat class.
+    #'
+    #' @description
+    #' Initialize a new Cat class.
+    #'
+    #' @param className className
+    #' @param color color. Default to 'red'.
+    #' @param declawed declawed
+    #' @param ... Other optional arguments.
+    #' @export
     initialize = function(
         `className`, `color`='red', `declawed`=NULL, ...
     ) {
@@ -45,6 +49,13 @@ Cat <- R6::R6Class(
         self$`declawed` <- `declawed`
       }
     },
+    #' To JSON string
+    #'
+    #' @description
+    #' To JSON String
+    #'
+    #' @return Cat in JSON format
+    #' @export
     toJSON = function() {
       CatObject <- list()
       if (!is.null(self$`className`)) {
@@ -62,19 +73,34 @@ Cat <- R6::R6Class(
 
       CatObject
     },
-    fromJSON = function(CatJson) {
-      CatObject <- jsonlite::fromJSON(CatJson)
-      if (!is.null(CatObject$`className`)) {
-        self$`className` <- CatObject$`className`
+    #' Deserialize JSON string into an instance of Cat
+    #'
+    #' @description
+    #' Deserialize JSON string into an instance of Cat
+    #'
+    #' @param input_json the JSON input
+    #' @return the instance of Cat
+    #' @export
+    fromJSON = function(input_json) {
+      this_object <- jsonlite::fromJSON(input_json)
+      if (!is.null(this_object$`className`)) {
+        self$`className` <- this_object$`className`
       }
-      if (!is.null(CatObject$`color`)) {
-        self$`color` <- CatObject$`color`
+      if (!is.null(this_object$`color`)) {
+        self$`color` <- this_object$`color`
       }
-      if (!is.null(CatObject$`declawed`)) {
-        self$`declawed` <- CatObject$`declawed`
+      if (!is.null(this_object$`declawed`)) {
+        self$`declawed` <- this_object$`declawed`
       }
       self
     },
+    #' To JSON string
+    #'
+    #' @description
+    #' To JSON String
+    #'
+    #' @return Cat in JSON format
+    #' @export
     toJSONString = function() {
       jsoncontent <- c(
         if (!is.null(self$`className`)) {
@@ -100,15 +126,30 @@ Cat <- R6::R6Class(
         )}
       )
       jsoncontent <- paste(jsoncontent, collapse = ",")
-      paste('{', jsoncontent, '}', sep = "")
+      jsonlite::minify(paste('{', jsoncontent, '}', sep = ""))
     },
-    fromJSONString = function(CatJson) {
-      CatObject <- jsonlite::fromJSON(CatJson)
-      self$`className` <- CatObject$`className`
-      self$`color` <- CatObject$`color`
-      self$`declawed` <- CatObject$`declawed`
+    #' Deserialize JSON string into an instance of Cat
+    #'
+    #' @description
+    #' Deserialize JSON string into an instance of Cat
+    #'
+    #' @param input_json the JSON input
+    #' @return the instance of Cat
+    #' @export
+    fromJSONString = function(input_json) {
+      this_object <- jsonlite::fromJSON(input_json)
+      self$`className` <- this_object$`className`
+      self$`color` <- this_object$`color`
+      self$`declawed` <- this_object$`declawed`
       self
     },
+    #' Validate JSON input with respect to Cat
+    #'
+    #' @description
+    #' Validate JSON input with respect to Cat and throw an exception if invalid
+    #'
+    #' @param input the JSON input
+    #' @export
     validateJSON = function(input) {
       input_json <- jsonlite::fromJSON(input)
       # check the required field `className`
@@ -117,8 +158,17 @@ Cat <- R6::R6Class(
       } else {
         stop(paste("The JSON input `", input, "` is invalid for Cat: the required field `className` is missing."))
       }
+    },
+    #' To string (JSON format)
+    #'
+    #' @description
+    #' To string (JSON format)
+    #'
+    #' @return String representation of Cat
+    #' @export
+    toString = function() {
+      self$toJSONString()
     }
-
   )
 )
 

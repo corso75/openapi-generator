@@ -8,13 +8,9 @@
 
 #' @docType class
 #' @title DogAllOf
-#'
 #' @description DogAllOf Class
-#'
 #' @format An \code{R6Class} generator object
-#'
 #' @field breed  character [optional]
-#'
 #' @importFrom R6 R6Class
 #' @importFrom jsonlite fromJSON toJSON
 #' @export
@@ -22,6 +18,14 @@ DogAllOf <- R6::R6Class(
   'DogAllOf',
   public = list(
     `breed` = NULL,
+    #' Initialize a new DogAllOf class.
+    #'
+    #' @description
+    #' Initialize a new DogAllOf class.
+    #'
+    #' @param breed breed
+    #' @param ... Other optional arguments.
+    #' @export
     initialize = function(
         `breed`=NULL, ...
     ) {
@@ -30,6 +34,13 @@ DogAllOf <- R6::R6Class(
         self$`breed` <- `breed`
       }
     },
+    #' To JSON string
+    #'
+    #' @description
+    #' To JSON String
+    #'
+    #' @return DogAllOf in JSON format
+    #' @export
     toJSON = function() {
       DogAllOfObject <- list()
       if (!is.null(self$`breed`)) {
@@ -39,13 +50,28 @@ DogAllOf <- R6::R6Class(
 
       DogAllOfObject
     },
-    fromJSON = function(DogAllOfJson) {
-      DogAllOfObject <- jsonlite::fromJSON(DogAllOfJson)
-      if (!is.null(DogAllOfObject$`breed`)) {
-        self$`breed` <- DogAllOfObject$`breed`
+    #' Deserialize JSON string into an instance of DogAllOf
+    #'
+    #' @description
+    #' Deserialize JSON string into an instance of DogAllOf
+    #'
+    #' @param input_json the JSON input
+    #' @return the instance of DogAllOf
+    #' @export
+    fromJSON = function(input_json) {
+      this_object <- jsonlite::fromJSON(input_json)
+      if (!is.null(this_object$`breed`)) {
+        self$`breed` <- this_object$`breed`
       }
       self
     },
+    #' To JSON string
+    #'
+    #' @description
+    #' To JSON String
+    #'
+    #' @return DogAllOf in JSON format
+    #' @export
     toJSONString = function() {
       jsoncontent <- c(
         if (!is.null(self$`breed`)) {
@@ -57,17 +83,41 @@ DogAllOf <- R6::R6Class(
         )}
       )
       jsoncontent <- paste(jsoncontent, collapse = ",")
-      paste('{', jsoncontent, '}', sep = "")
+      jsonlite::minify(paste('{', jsoncontent, '}', sep = ""))
     },
-    fromJSONString = function(DogAllOfJson) {
-      DogAllOfObject <- jsonlite::fromJSON(DogAllOfJson)
-      self$`breed` <- DogAllOfObject$`breed`
+    #' Deserialize JSON string into an instance of DogAllOf
+    #'
+    #' @description
+    #' Deserialize JSON string into an instance of DogAllOf
+    #'
+    #' @param input_json the JSON input
+    #' @return the instance of DogAllOf
+    #' @export
+    fromJSONString = function(input_json) {
+      this_object <- jsonlite::fromJSON(input_json)
+      self$`breed` <- this_object$`breed`
       self
     },
+    #' Validate JSON input with respect to DogAllOf
+    #'
+    #' @description
+    #' Validate JSON input with respect to DogAllOf and throw an exception if invalid
+    #'
+    #' @param input the JSON input
+    #' @export
     validateJSON = function(input) {
       input_json <- jsonlite::fromJSON(input)
+    },
+    #' To string (JSON format)
+    #'
+    #' @description
+    #' To string (JSON format)
+    #'
+    #' @return String representation of DogAllOf
+    #' @export
+    toString = function() {
+      self$toJSONString()
     }
-
   )
 )
 
