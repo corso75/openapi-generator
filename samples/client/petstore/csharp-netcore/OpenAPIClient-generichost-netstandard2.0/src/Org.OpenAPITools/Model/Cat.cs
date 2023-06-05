@@ -36,11 +36,14 @@ namespace Org.OpenAPITools.Model
         /// <param name="className">className</param>
         /// <param name="color">color (default to &quot;red&quot;)</param>
         [JsonConstructor]
-        internal Cat(Dictionary<string, int> dictionary, CatAllOf catAllOf, string className, string color = "red") : base(className, color)
+        internal Cat(Dictionary<string, int> dictionary, CatAllOf catAllOf, string className, string color = @"red") : base(className, color)
         {
             Dictionary = dictionary;
             CatAllOf = catAllOf;
+            OnCreated();
         }
+
+        partial void OnCreated();
 
         /// <summary>
         /// Gets or Sets Dictionary
@@ -60,19 +63,19 @@ namespace Org.OpenAPITools.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class Cat {\n");
-            sb.Append("  ").Append(base.ToString().Replace("\n", "\n  ")).Append("\n");
+            sb.Append("  ").Append(base.ToString()?.Replace("\n", "\n  ")).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
     }
 
     /// <summary>
-    /// A Json converter for type Cat
+    /// A Json converter for type <see cref="Cat" />
     /// </summary>
     public class CatJsonConverter : JsonConverter<Cat>
     {
         /// <summary>
-        /// A Json reader.
+        /// Deserializes json to <see cref="Cat" />
         /// </summary>
         /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
@@ -124,11 +127,23 @@ namespace Org.OpenAPITools.Model
                 }
             }
 
+            if (className == null)
+                throw new ArgumentNullException(nameof(className), "Property is required for class Cat.");
+
+            if (color == null)
+                throw new ArgumentNullException(nameof(color), "Property is required for class Cat.");
+
+            if (dictionary == null)
+                throw new ArgumentNullException(nameof(dictionary), "Property is required for class Cat.");
+
+            if (catAllOf == null)
+                throw new ArgumentNullException(nameof(catAllOf), "Property is required for class Cat.");
+
             return new Cat(dictionary, catAllOf, className, color);
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="Cat" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="cat"></param>
@@ -136,12 +151,10 @@ namespace Org.OpenAPITools.Model
         /// <exception cref="NotImplementedException"></exception>
         public override void Write(Utf8JsonWriter writer, Cat cat, JsonSerializerOptions jsonSerializerOptions)
         {
-            writer.WriteStartObject();
+            System.Text.Json.JsonSerializer.Serialize(writer, cat.Dictionary, jsonSerializerOptions);
 
-            writer.WriteString("className", cat.ClassName);
-            writer.WriteString("color", cat.Color);
+            System.Text.Json.JsonSerializer.Serialize(writer, cat.CatAllOf, jsonSerializerOptions);
 
-            writer.WriteEndObject();
         }
     }
 }

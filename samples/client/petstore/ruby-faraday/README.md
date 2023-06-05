@@ -173,6 +173,7 @@ Class | Method | HTTP request | Description
 ## Documentation for Authorization
 
 
+Authentication schemes defined for the API:
 ### petstore_auth
 
 
@@ -207,4 +208,5 @@ Class | Method | HTTP request | Description
 
 ### http_signature_test
 
+- **Type**: HTTP signature authentication
 

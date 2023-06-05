@@ -23,7 +23,7 @@ import type {
   OuterObjectWithEnumProperty,
   Pet,
   User,
-} from '../models';
+} from '../models/index';
 import {
     ClientFromJSON,
     ClientToJSON,
@@ -41,7 +41,7 @@ import {
     PetToJSON,
     UserFromJSON,
     UserToJSON,
-} from '../models';
+} from '../models/index';
 
 export interface FakeHttpSignatureTestRequest {
     pet: Pet;
@@ -232,7 +232,11 @@ export class FakeApi extends runtime.BaseAPI {
             body: requestParameters.body as any,
         }, initOverrides);
 
-        return new runtime.TextApiResponse(response) as any;
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<boolean>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
@@ -290,7 +294,11 @@ export class FakeApi extends runtime.BaseAPI {
             body: requestParameters.body as any,
         }, initOverrides);
 
-        return new runtime.TextApiResponse(response) as any;
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
@@ -319,7 +327,11 @@ export class FakeApi extends runtime.BaseAPI {
             body: requestParameters.body as any,
         }, initOverrides);
 
-        return new runtime.TextApiResponse(response) as any;
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
