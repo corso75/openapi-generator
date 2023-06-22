@@ -7,6 +7,7 @@ from typing import Union
 {{#imports}}{{import}}  # noqa: E501
 {{/imports}}
 from {{packageName}} import util
+from {{packageName}}.internal.controllers.i_{{classFilename}} import *
 {{#operations}}
 {{#operation}}
 
@@ -110,6 +111,6 @@ def {{operationId}}({{#allParams}}{{paramName}}{{^required}}=None{{/required}}{{
             {{/items}}
         {{/isMap}}
     {{/allParams}}
-    return 'do some magic!'
+    return i_{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}})
 {{/operation}}
 {{/operations}}
