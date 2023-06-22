@@ -53,7 +53,6 @@ namespace Org.OpenAPITools.Test.Model
             //Assert.IsType<Fruit>(instance);
         }
 
-
         /// <summary>
         /// Test the property 'Color'
         /// </summary>
@@ -63,6 +62,31 @@ namespace Org.OpenAPITools.Test.Model
             // TODO unit test for the property 'Color'
         }
 
-    }
+        /// <summary>
+        /// Test the property 'Cultivar'
+        /// </summary>
+        [Fact]
+        public void CultivarTest()
+        {
+            // TODO unit test for the property 'Cultivar'
+        }
 
+        /// <summary>
+        /// Test the property 'LengthCm'
+        /// </summary>
+        [Fact]
+        public void LengthCmTest()
+        {
+            // TODO unit test for the property 'LengthCm'
+        }
+
+        /// <summary>
+        /// Test the property 'Origin'
+        /// </summary>
+        [Fact]
+        public void OriginTest()
+        {
+            // TODO unit test for the property 'Origin'
+        }
+    }
 }

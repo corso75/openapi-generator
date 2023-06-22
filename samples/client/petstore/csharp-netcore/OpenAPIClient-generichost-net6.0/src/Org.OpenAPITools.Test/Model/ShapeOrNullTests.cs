@@ -53,7 +53,6 @@ namespace Org.OpenAPITools.Test.Model
             //Assert.IsType<ShapeOrNull>(instance);
         }
 
-
         /// <summary>
         /// Test the property 'QuadrilateralType'
         /// </summary>
@@ -63,6 +62,13 @@ namespace Org.OpenAPITools.Test.Model
             // TODO unit test for the property 'QuadrilateralType'
         }
 
+        /// <summary>
+        /// Test the property 'ShapeType'
+        /// </summary>
+        [Fact]
+        public void ShapeTypeTest()
+        {
+            // TODO unit test for the property 'ShapeType'
+        }
     }
-
 }

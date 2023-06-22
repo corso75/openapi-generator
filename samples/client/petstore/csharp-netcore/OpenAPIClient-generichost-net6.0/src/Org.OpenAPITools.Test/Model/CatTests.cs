@@ -53,8 +53,13 @@ namespace Org.OpenAPITools.Test.Model
             //Assert.IsType<Cat>(instance);
         }
 
-
-
+        /// <summary>
+        /// Test the property 'Declawed'
+        /// </summary>
+        [Fact]
+        public void DeclawedTest()
+        {
+            // TODO unit test for the property 'Declawed'
+        }
     }
-
 }

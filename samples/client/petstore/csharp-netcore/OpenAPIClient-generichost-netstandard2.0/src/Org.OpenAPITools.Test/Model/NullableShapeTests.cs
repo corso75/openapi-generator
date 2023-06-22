@@ -53,8 +53,22 @@ namespace Org.OpenAPITools.Test.Model
             //Assert.IsType<NullableShape>(instance);
         }
 
+        /// <summary>
+        /// Test the property 'QuadrilateralType'
+        /// </summary>
+        [Fact]
+        public void QuadrilateralTypeTest()
+        {
+            // TODO unit test for the property 'QuadrilateralType'
+        }
 
-
+        /// <summary>
+        /// Test the property 'ShapeType'
+        /// </summary>
+        [Fact]
+        public void ShapeTypeTest()
+        {
+            // TODO unit test for the property 'ShapeType'
+        }
     }
-
 }

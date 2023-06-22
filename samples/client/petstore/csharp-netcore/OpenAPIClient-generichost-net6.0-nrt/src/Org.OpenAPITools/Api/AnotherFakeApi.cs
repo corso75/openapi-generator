@@ -59,7 +59,7 @@ namespace Org.OpenAPITools.Api
     /// <summary>
     /// Represents a collection of functions to interact with the API endpoints
     /// </summary>
-    public partial class AnotherFakeApi : IApi.IAnotherFakeApi
+    public sealed partial class AnotherFakeApi : IApi.IAnotherFakeApi
     {
         private JsonSerializerOptions _jsonSerializerOptions;
 
@@ -145,16 +145,19 @@ namespace Org.OpenAPITools.Api
         /// <param name="modelClient"></param>
         private void AfterCall123TestSpecialTagsDefaultImplementation(ApiResponse<ModelClient> apiResponseLocalVar, ModelClient modelClient)
         {
-            Logger.LogInformation("{0,-9} | {1} | {3}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
-            AfterCall123TestSpecialTags(apiResponseLocalVar, modelClient);
+            bool suppressDefaultLog = false;
+            AfterCall123TestSpecialTags(ref suppressDefaultLog, apiResponseLocalVar, modelClient);
+            if (!suppressDefaultLog)
+                Logger.LogInformation("{0,-9} | {1} | {3}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
         }
 
         /// <summary>
         /// Processes the server response
         /// </summary>
+        /// <param name="suppressDefaultLog"></param>
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="modelClient"></param>
-        partial void AfterCall123TestSpecialTags(ApiResponse<ModelClient> apiResponseLocalVar, ModelClient modelClient);
+        partial void AfterCall123TestSpecialTags(ref bool suppressDefaultLog, ApiResponse<ModelClient> apiResponseLocalVar, ModelClient modelClient);
 
         /// <summary>
         /// Logs exceptions that occur while retrieving the server response

@@ -53,8 +53,13 @@ namespace Org.OpenAPITools.Test.Model
             //Assert.IsType<Pig>(instance);
         }
 
-
-
+        /// <summary>
+        /// Test the property 'ClassName'
+        /// </summary>
+        [Fact]
+        public void ClassNameTest()
+        {
+            // TODO unit test for the property 'ClassName'
+        }
     }
-
 }

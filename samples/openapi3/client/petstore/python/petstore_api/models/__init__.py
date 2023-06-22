@@ -26,7 +26,6 @@ from petstore_api.models.array_test import ArrayTest
 from petstore_api.models.basque_pig import BasquePig
 from petstore_api.models.capitalization import Capitalization
 from petstore_api.models.cat import Cat
-from petstore_api.models.cat_all_of import CatAllOf
 from petstore_api.models.category import Category
 from petstore_api.models.circular_reference_model import CircularReferenceModel
 from petstore_api.models.class_model import ClassModel
@@ -35,7 +34,6 @@ from petstore_api.models.color import Color
 from petstore_api.models.danish_pig import DanishPig
 from petstore_api.models.deprecated_object import DeprecatedObject
 from petstore_api.models.dog import Dog
-from petstore_api.models.dog_all_of import DogAllOf
 from petstore_api.models.dummy_model import DummyModel
 from petstore_api.models.enum_arrays import EnumArrays
 from petstore_api.models.enum_class import EnumClass
@@ -53,6 +51,7 @@ from petstore_api.models.health_check_result import HealthCheckResult
 from petstore_api.models.inner_dict_with_property import InnerDictWithProperty
 from petstore_api.models.int_or_string import IntOrString
 from petstore_api.models.list import List
+from petstore_api.models.map_of_array_of_model import MapOfArrayOfModel
 from petstore_api.models.map_test import MapTest
 from petstore_api.models.mixed_properties_and_additional_properties_class import MixedPropertiesAndAdditionalPropertiesClass
 from petstore_api.models.model200_response import Model200Response
