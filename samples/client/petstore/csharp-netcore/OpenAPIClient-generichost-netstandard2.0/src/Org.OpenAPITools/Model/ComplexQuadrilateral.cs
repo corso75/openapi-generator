@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
@@ -27,34 +26,40 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// ComplexQuadrilateral
     /// </summary>
-    public partial class ComplexQuadrilateral : IEquatable<ComplexQuadrilateral>, IValidatableObject
+    public partial class ComplexQuadrilateral : IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ComplexQuadrilateral" /> class.
         /// </summary>
-        /// <param name="shapeInterface"></param>
-        /// <param name="quadrilateralInterface"></param>
-        public ComplexQuadrilateral(ShapeInterface shapeInterface, QuadrilateralInterface quadrilateralInterface)
+        /// <param name="quadrilateralType">quadrilateralType</param>
+        /// <param name="shapeType">shapeType</param>
+        [JsonConstructor]
+        public ComplexQuadrilateral(string quadrilateralType, string shapeType)
         {
-            ShapeInterface = shapeInterface;
-            QuadrilateralInterface = quadrilateralInterface;
+            QuadrilateralType = quadrilateralType;
+            ShapeType = shapeType;
+            OnCreated();
         }
 
-        /// <summary>
-        /// Gets or Sets ShapeInterface
-        /// </summary>
-        public ShapeInterface ShapeInterface { get; set; }
+        partial void OnCreated();
 
         /// <summary>
-        /// Gets or Sets QuadrilateralInterface
+        /// Gets or Sets QuadrilateralType
         /// </summary>
-        public QuadrilateralInterface QuadrilateralInterface { get; set; }
+        [JsonPropertyName("quadrilateralType")]
+        public string QuadrilateralType { get; set; }
+
+        /// <summary>
+        /// Gets or Sets ShapeType
+        /// </summary>
+        [JsonPropertyName("shapeType")]
+        public string ShapeType { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
         /// </summary>
         [JsonExtensionData]
-        public Dictionary<string, JsonElement> AdditionalProperties { get; set; } = new Dictionary<string, JsonElement>();
+        public Dictionary<string, JsonElement> AdditionalProperties { get; } = new Dictionary<string, JsonElement>();
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -64,46 +69,11 @@ namespace Org.OpenAPITools.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class ComplexQuadrilateral {\n");
+            sb.Append("  QuadrilateralType: ").Append(QuadrilateralType).Append("\n");
+            sb.Append("  ShapeType: ").Append(ShapeType).Append("\n");
             sb.Append("  AdditionalProperties: ").Append(AdditionalProperties).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns true if objects are equal
-        /// </summary>
-        /// <param name="input">Object to be compared</param>
-        /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input as ComplexQuadrilateral).AreEqual;
-        }
-
-        /// <summary>
-        /// Returns true if ComplexQuadrilateral instances are equal
-        /// </summary>
-        /// <param name="input">Instance of ComplexQuadrilateral to be compared</param>
-        /// <returns>Boolean</returns>
-        public bool Equals(ComplexQuadrilateral input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input).AreEqual;
-        }
-
-        /// <summary>
-        /// Gets the hash code
-        /// </summary>
-        /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
-            unchecked // Overflow is fine, just wrap
-            {
-                int hashCode = 41;
-                if (this.AdditionalProperties != null)
-                {
-                    hashCode = (hashCode * 59) + this.AdditionalProperties.GetHashCode();
-                }
-                return hashCode;
-            }
         }
 
         /// <summary>
@@ -111,72 +81,88 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
             yield break;
         }
     }
 
     /// <summary>
-    /// A Json converter for type ComplexQuadrilateral
+    /// A Json converter for type <see cref="ComplexQuadrilateral" />
     /// </summary>
     public class ComplexQuadrilateralJsonConverter : JsonConverter<ComplexQuadrilateral>
     {
         /// <summary>
-        /// Returns a boolean if the type is compatible with this converter.
+        /// Deserializes json to <see cref="ComplexQuadrilateral" />
         /// </summary>
+        /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type typeToConvert) => typeof(ComplexQuadrilateral).IsAssignableFrom(typeToConvert);
-
-        /// <summary>
-        /// A Json reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="typeToConvert"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <returns></returns>
         /// <exception cref="JsonException"></exception>
-        public override ComplexQuadrilateral Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override ComplexQuadrilateral Read(ref Utf8JsonReader utf8JsonReader, Type typeToConvert, JsonSerializerOptions jsonSerializerOptions)
         {
-            int currentDepth = reader.CurrentDepth;
+            int currentDepth = utf8JsonReader.CurrentDepth;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (utf8JsonReader.TokenType != JsonTokenType.StartObject && utf8JsonReader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            Utf8JsonReader shapeInterfaceReader = reader;
-            bool shapeInterfaceDeserialized = Client.ClientUtils.TryDeserialize<ShapeInterface>(ref shapeInterfaceReader, options, out ShapeInterface shapeInterface);
+            JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
-            Utf8JsonReader quadrilateralInterfaceReader = reader;
-            bool quadrilateralInterfaceDeserialized = Client.ClientUtils.TryDeserialize<QuadrilateralInterface>(ref quadrilateralInterfaceReader, options, out QuadrilateralInterface quadrilateralInterface);
+            string quadrilateralType = default;
+            string shapeType = default;
 
-
-            while (reader.Read())
+            while (utf8JsonReader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject && currentDepth == reader.CurrentDepth)
+                if (startingTokenType == JsonTokenType.StartObject && utf8JsonReader.TokenType == JsonTokenType.EndObject && currentDepth == utf8JsonReader.CurrentDepth)
                     break;
 
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                if (startingTokenType == JsonTokenType.StartArray && utf8JsonReader.TokenType == JsonTokenType.EndArray && currentDepth == utf8JsonReader.CurrentDepth)
+                    break;
+
+                if (utf8JsonReader.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReader.CurrentDepth - 1)
                 {
-                    string propertyName = reader.GetString();
-                    reader.Read();
+                    string propertyName = utf8JsonReader.GetString();
+                    utf8JsonReader.Read();
 
                     switch (propertyName)
                     {
+                        case "quadrilateralType":
+                            quadrilateralType = utf8JsonReader.GetString();
+                            break;
+                        case "shapeType":
+                            shapeType = utf8JsonReader.GetString();
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
 
-            return new ComplexQuadrilateral(shapeInterface, quadrilateralInterface);
+            if (quadrilateralType == null)
+                throw new ArgumentNullException(nameof(quadrilateralType), "Property is required for class ComplexQuadrilateral.");
+
+            if (shapeType == null)
+                throw new ArgumentNullException(nameof(shapeType), "Property is required for class ComplexQuadrilateral.");
+
+            return new ComplexQuadrilateral(quadrilateralType, shapeType);
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="ComplexQuadrilateral" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="complexQuadrilateral"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public override void Write(Utf8JsonWriter writer, ComplexQuadrilateral complexQuadrilateral, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, ComplexQuadrilateral complexQuadrilateral, JsonSerializerOptions jsonSerializerOptions)
+        {
+            writer.WriteStartObject();
+
+            writer.WriteString("quadrilateralType", complexQuadrilateral.QuadrilateralType);
+            writer.WriteString("shapeType", complexQuadrilateral.ShapeType);
+
+            writer.WriteEndObject();
+        }
     }
 }

@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
@@ -29,35 +28,81 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// FruitReq
     /// </summary>
-    public partial class FruitReq : IEquatable<FruitReq>, IValidatableObject
+    public partial class FruitReq : IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FruitReq" /> class.
         /// </summary>
         /// <param name="appleReq"></param>
-        public FruitReq(AppleReq appleReq)
+        /// <param name="cultivar">cultivar</param>
+        /// <param name="lengthCm">lengthCm</param>
+        /// <param name="mealy">mealy</param>
+        /// <param name="sweet">sweet</param>
+        [JsonConstructor]
+        public FruitReq(AppleReq? appleReq, string cultivar, decimal lengthCm, bool mealy, bool sweet)
         {
             AppleReq = appleReq;
+            Cultivar = cultivar;
+            LengthCm = lengthCm;
+            Mealy = mealy;
+            Sweet = sweet;
+            OnCreated();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FruitReq" /> class.
         /// </summary>
         /// <param name="bananaReq"></param>
-        public FruitReq(BananaReq bananaReq)
+        /// <param name="cultivar">cultivar</param>
+        /// <param name="lengthCm">lengthCm</param>
+        /// <param name="mealy">mealy</param>
+        /// <param name="sweet">sweet</param>
+        [JsonConstructor]
+        public FruitReq(BananaReq? bananaReq, string cultivar, decimal lengthCm, bool mealy, bool sweet)
         {
             BananaReq = bananaReq;
+            Cultivar = cultivar;
+            LengthCm = lengthCm;
+            Mealy = mealy;
+            Sweet = sweet;
+            OnCreated();
         }
+
+        partial void OnCreated();
 
         /// <summary>
         /// Gets or Sets AppleReq
         /// </summary>
-        public AppleReq AppleReq { get; set; }
+        public AppleReq? AppleReq { get; set; }
 
         /// <summary>
         /// Gets or Sets BananaReq
         /// </summary>
-        public BananaReq BananaReq { get; set; }
+        public BananaReq? BananaReq { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Cultivar
+        /// </summary>
+        [JsonPropertyName("cultivar")]
+        public string Cultivar { get; set; }
+
+        /// <summary>
+        /// Gets or Sets LengthCm
+        /// </summary>
+        [JsonPropertyName("lengthCm")]
+        public decimal LengthCm { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Mealy
+        /// </summary>
+        [JsonPropertyName("mealy")]
+        public bool Mealy { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Sweet
+        /// </summary>
+        [JsonPropertyName("sweet")]
+        public bool Sweet { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -67,41 +112,12 @@ namespace Org.OpenAPITools.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class FruitReq {\n");
+            sb.Append("  Cultivar: ").Append(Cultivar).Append("\n");
+            sb.Append("  LengthCm: ").Append(LengthCm).Append("\n");
+            sb.Append("  Mealy: ").Append(Mealy).Append("\n");
+            sb.Append("  Sweet: ").Append(Sweet).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns true if objects are equal
-        /// </summary>
-        /// <param name="input">Object to be compared</param>
-        /// <returns>Boolean</returns>
-        public override bool Equals(object? input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input as FruitReq).AreEqual;
-        }
-
-        /// <summary>
-        /// Returns true if FruitReq instances are equal
-        /// </summary>
-        /// <param name="input">Instance of FruitReq to be compared</param>
-        /// <returns>Boolean</returns>
-        public bool Equals(FruitReq? input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input).AreEqual;
-        }
-
-        /// <summary>
-        /// Gets the hash code
-        /// </summary>
-        /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
-            unchecked // Overflow is fine, just wrap
-            {
-                int hashCode = 41;
-                return hashCode;
-            }
         }
 
         /// <summary>
@@ -109,78 +125,119 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
             yield break;
         }
     }
 
     /// <summary>
-    /// A Json converter for type FruitReq
+    /// A Json converter for type <see cref="FruitReq" />
     /// </summary>
     public class FruitReqJsonConverter : JsonConverter<FruitReq>
     {
         /// <summary>
-        /// Returns a boolean if the type is compatible with this converter.
+        /// Deserializes json to <see cref="FruitReq" />
         /// </summary>
+        /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type typeToConvert) => typeof(FruitReq).IsAssignableFrom(typeToConvert);
-
-        /// <summary>
-        /// A Json reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="typeToConvert"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <returns></returns>
         /// <exception cref="JsonException"></exception>
-        public override FruitReq Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override FruitReq Read(ref Utf8JsonReader utf8JsonReader, Type typeToConvert, JsonSerializerOptions jsonSerializerOptions)
         {
-            int currentDepth = reader.CurrentDepth;
+            int currentDepth = utf8JsonReader.CurrentDepth;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (utf8JsonReader.TokenType != JsonTokenType.StartObject && utf8JsonReader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            Utf8JsonReader appleReqReader = reader;
-            bool appleReqDeserialized = Client.ClientUtils.TryDeserialize<AppleReq>(ref appleReqReader, options, out AppleReq? appleReq);
+            JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
-            Utf8JsonReader bananaReqReader = reader;
-            bool bananaReqDeserialized = Client.ClientUtils.TryDeserialize<BananaReq>(ref bananaReqReader, options, out BananaReq? bananaReq);
+            string? cultivar = default;
+            decimal? lengthCm = default;
+            bool? mealy = default;
+            bool? sweet = default;
 
-
-            while (reader.Read())
+            while (utf8JsonReader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject && currentDepth == reader.CurrentDepth)
+                if (startingTokenType == JsonTokenType.StartObject && utf8JsonReader.TokenType == JsonTokenType.EndObject && currentDepth == utf8JsonReader.CurrentDepth)
                     break;
 
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                if (startingTokenType == JsonTokenType.StartArray && utf8JsonReader.TokenType == JsonTokenType.EndArray && currentDepth == utf8JsonReader.CurrentDepth)
+                    break;
+
+                if (utf8JsonReader.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReader.CurrentDepth - 1)
                 {
-                    string? propertyName = reader.GetString();
-                    reader.Read();
+                    string? propertyName = utf8JsonReader.GetString();
+                    utf8JsonReader.Read();
 
                     switch (propertyName)
                     {
+                        case "cultivar":
+                            cultivar = utf8JsonReader.GetString();
+                            break;
+                        case "lengthCm":
+                            if (utf8JsonReader.TokenType != JsonTokenType.Null)
+                                lengthCm = utf8JsonReader.GetDecimal();
+                            break;
+                        case "mealy":
+                            if (utf8JsonReader.TokenType != JsonTokenType.Null)
+                                mealy = utf8JsonReader.GetBoolean();
+                            break;
+                        case "sweet":
+                            if (utf8JsonReader.TokenType != JsonTokenType.Null)
+                                sweet = utf8JsonReader.GetBoolean();
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
 
-            if (appleReqDeserialized)
-                return new FruitReq(appleReq);
+            if (cultivar == null)
+                throw new ArgumentNullException(nameof(cultivar), "Property is required for class FruitReq.");
 
-            if (bananaReqDeserialized)
-                return new FruitReq(bananaReq);
+            if (lengthCm == null)
+                throw new ArgumentNullException(nameof(lengthCm), "Property is required for class FruitReq.");
+
+            if (mealy == null)
+                throw new ArgumentNullException(nameof(mealy), "Property is required for class FruitReq.");
+
+            if (sweet == null)
+                throw new ArgumentNullException(nameof(sweet), "Property is required for class FruitReq.");
+
+            Utf8JsonReader appleReqReader = utf8JsonReader;
+            if (Client.ClientUtils.TryDeserialize<AppleReq>(ref appleReqReader, jsonSerializerOptions, out AppleReq? appleReq))
+                return new FruitReq(appleReq, cultivar, lengthCm.Value, mealy.Value, sweet.Value);
+
+            Utf8JsonReader bananaReqReader = utf8JsonReader;
+            if (Client.ClientUtils.TryDeserialize<BananaReq>(ref bananaReqReader, jsonSerializerOptions, out BananaReq? bananaReq))
+                return new FruitReq(bananaReq, cultivar, lengthCm.Value, mealy.Value, sweet.Value);
 
             throw new JsonException();
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="FruitReq" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="fruitReq"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public override void Write(Utf8JsonWriter writer, FruitReq fruitReq, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, FruitReq fruitReq, JsonSerializerOptions jsonSerializerOptions)
+        {
+            System.Text.Json.JsonSerializer.Serialize(writer, fruitReq.AppleReq, jsonSerializerOptions);
+
+            System.Text.Json.JsonSerializer.Serialize(writer, fruitReq.BananaReq, jsonSerializerOptions);
+
+            writer.WriteStartObject();
+
+            writer.WriteString("cultivar", fruitReq.Cultivar);
+            writer.WriteNumber("lengthCm", fruitReq.LengthCm);
+            writer.WriteBoolean("mealy", fruitReq.Mealy);
+            writer.WriteBoolean("sweet", fruitReq.Sweet);
+
+            writer.WriteEndObject();
+        }
     }
 }

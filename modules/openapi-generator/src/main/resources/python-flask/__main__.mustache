@@ -1,9 +1,4 @@
-{{#supportPython2}}
-#!/usr/bin/env python
-{{/supportPython2}}
-{{^supportPython2}}
 #!/usr/bin/env python3
-{{/supportPython2}}
 
 import connexion
 {{#featureCORS}}
@@ -59,4 +54,3 @@ if __name__ == '__main__':
 
     global_settings.oVBoxMgr.deinit()
     del global_settings.oVBoxMgr
-

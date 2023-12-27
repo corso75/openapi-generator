@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.openapitools.model.BigCatAllOf;
 import org.openapitools.model.Cat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -68,8 +67,18 @@ public class BigCat extends Cat {
     }
   }
 
-  @JsonProperty("kind")
   private KindEnum kind;
+
+  public BigCat() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public BigCat(String className) {
+    super(className);
+  }
 
   public BigCat kind(KindEnum kind) {
     this.kind = kind;
@@ -82,6 +91,7 @@ public class BigCat extends Cat {
   */
   
   @ApiModelProperty(value = "")
+  @JsonProperty("kind")
   public KindEnum getKind() {
     return kind;
   }
@@ -89,6 +99,7 @@ public class BigCat extends Cat {
   public void setKind(KindEnum kind) {
     this.kind = kind;
   }
+
 
   public BigCat declawed(Boolean declawed) {
     super.setDeclawed(declawed);
@@ -104,7 +115,6 @@ public class BigCat extends Cat {
     super.setColor(color);
     return this;
   }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

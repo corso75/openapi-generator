@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
@@ -27,34 +26,40 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// ScaleneTriangle
     /// </summary>
-    public partial class ScaleneTriangle : IEquatable<ScaleneTriangle>, IValidatableObject
+    public partial class ScaleneTriangle : IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScaleneTriangle" /> class.
         /// </summary>
-        /// <param name="shapeInterface"></param>
-        /// <param name="triangleInterface"></param>
-        public ScaleneTriangle(ShapeInterface shapeInterface, TriangleInterface triangleInterface)
+        /// <param name="shapeType">shapeType</param>
+        /// <param name="triangleType">triangleType</param>
+        [JsonConstructor]
+        public ScaleneTriangle(string shapeType, string triangleType)
         {
-            ShapeInterface = shapeInterface;
-            TriangleInterface = triangleInterface;
+            ShapeType = shapeType;
+            TriangleType = triangleType;
+            OnCreated();
         }
 
-        /// <summary>
-        /// Gets or Sets ShapeInterface
-        /// </summary>
-        public ShapeInterface ShapeInterface { get; set; }
+        partial void OnCreated();
 
         /// <summary>
-        /// Gets or Sets TriangleInterface
+        /// Gets or Sets ShapeType
         /// </summary>
-        public TriangleInterface TriangleInterface { get; set; }
+        [JsonPropertyName("shapeType")]
+        public string ShapeType { get; set; }
+
+        /// <summary>
+        /// Gets or Sets TriangleType
+        /// </summary>
+        [JsonPropertyName("triangleType")]
+        public string TriangleType { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
         /// </summary>
         [JsonExtensionData]
-        public Dictionary<string, JsonElement> AdditionalProperties { get; set; } = new Dictionary<string, JsonElement>();
+        public Dictionary<string, JsonElement> AdditionalProperties { get; } = new Dictionary<string, JsonElement>();
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -64,46 +69,11 @@ namespace Org.OpenAPITools.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class ScaleneTriangle {\n");
+            sb.Append("  ShapeType: ").Append(ShapeType).Append("\n");
+            sb.Append("  TriangleType: ").Append(TriangleType).Append("\n");
             sb.Append("  AdditionalProperties: ").Append(AdditionalProperties).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns true if objects are equal
-        /// </summary>
-        /// <param name="input">Object to be compared</param>
-        /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input as ScaleneTriangle).AreEqual;
-        }
-
-        /// <summary>
-        /// Returns true if ScaleneTriangle instances are equal
-        /// </summary>
-        /// <param name="input">Instance of ScaleneTriangle to be compared</param>
-        /// <returns>Boolean</returns>
-        public bool Equals(ScaleneTriangle input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input).AreEqual;
-        }
-
-        /// <summary>
-        /// Gets the hash code
-        /// </summary>
-        /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
-            unchecked // Overflow is fine, just wrap
-            {
-                int hashCode = 41;
-                if (this.AdditionalProperties != null)
-                {
-                    hashCode = (hashCode * 59) + this.AdditionalProperties.GetHashCode();
-                }
-                return hashCode;
-            }
         }
 
         /// <summary>
@@ -111,72 +81,88 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
             yield break;
         }
     }
 
     /// <summary>
-    /// A Json converter for type ScaleneTriangle
+    /// A Json converter for type <see cref="ScaleneTriangle" />
     /// </summary>
     public class ScaleneTriangleJsonConverter : JsonConverter<ScaleneTriangle>
     {
         /// <summary>
-        /// Returns a boolean if the type is compatible with this converter.
+        /// Deserializes json to <see cref="ScaleneTriangle" />
         /// </summary>
+        /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type typeToConvert) => typeof(ScaleneTriangle).IsAssignableFrom(typeToConvert);
-
-        /// <summary>
-        /// A Json reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="typeToConvert"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <returns></returns>
         /// <exception cref="JsonException"></exception>
-        public override ScaleneTriangle Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override ScaleneTriangle Read(ref Utf8JsonReader utf8JsonReader, Type typeToConvert, JsonSerializerOptions jsonSerializerOptions)
         {
-            int currentDepth = reader.CurrentDepth;
+            int currentDepth = utf8JsonReader.CurrentDepth;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (utf8JsonReader.TokenType != JsonTokenType.StartObject && utf8JsonReader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            Utf8JsonReader shapeInterfaceReader = reader;
-            bool shapeInterfaceDeserialized = Client.ClientUtils.TryDeserialize<ShapeInterface>(ref shapeInterfaceReader, options, out ShapeInterface shapeInterface);
+            JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
-            Utf8JsonReader triangleInterfaceReader = reader;
-            bool triangleInterfaceDeserialized = Client.ClientUtils.TryDeserialize<TriangleInterface>(ref triangleInterfaceReader, options, out TriangleInterface triangleInterface);
+            string shapeType = default;
+            string triangleType = default;
 
-
-            while (reader.Read())
+            while (utf8JsonReader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject && currentDepth == reader.CurrentDepth)
+                if (startingTokenType == JsonTokenType.StartObject && utf8JsonReader.TokenType == JsonTokenType.EndObject && currentDepth == utf8JsonReader.CurrentDepth)
                     break;
 
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                if (startingTokenType == JsonTokenType.StartArray && utf8JsonReader.TokenType == JsonTokenType.EndArray && currentDepth == utf8JsonReader.CurrentDepth)
+                    break;
+
+                if (utf8JsonReader.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReader.CurrentDepth - 1)
                 {
-                    string propertyName = reader.GetString();
-                    reader.Read();
+                    string propertyName = utf8JsonReader.GetString();
+                    utf8JsonReader.Read();
 
                     switch (propertyName)
                     {
+                        case "shapeType":
+                            shapeType = utf8JsonReader.GetString();
+                            break;
+                        case "triangleType":
+                            triangleType = utf8JsonReader.GetString();
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
 
-            return new ScaleneTriangle(shapeInterface, triangleInterface);
+            if (shapeType == null)
+                throw new ArgumentNullException(nameof(shapeType), "Property is required for class ScaleneTriangle.");
+
+            if (triangleType == null)
+                throw new ArgumentNullException(nameof(triangleType), "Property is required for class ScaleneTriangle.");
+
+            return new ScaleneTriangle(shapeType, triangleType);
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="ScaleneTriangle" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="scaleneTriangle"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public override void Write(Utf8JsonWriter writer, ScaleneTriangle scaleneTriangle, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, ScaleneTriangle scaleneTriangle, JsonSerializerOptions jsonSerializerOptions)
+        {
+            writer.WriteStartObject();
+
+            writer.WriteString("shapeType", scaleneTriangle.ShapeType);
+            writer.WriteString("triangleType", scaleneTriangle.TriangleType);
+
+            writer.WriteEndObject();
+        }
     }
 }

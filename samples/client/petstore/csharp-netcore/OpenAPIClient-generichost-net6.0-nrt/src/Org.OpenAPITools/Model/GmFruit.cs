@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
@@ -29,20 +28,30 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// GmFruit
     /// </summary>
-    public partial class GmFruit : IEquatable<GmFruit>, IValidatableObject
+    public partial class GmFruit : IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GmFruit" /> class.
         /// </summary>
-        /// <param name="apple?"></param>
+        /// <param name="apple"></param>
         /// <param name="banana"></param>
+        /// <param name="cultivar">cultivar</param>
+        /// <param name="lengthCm">lengthCm</param>
+        /// <param name="origin">origin</param>
         /// <param name="color">color</param>
-        public GmFruit(Apple? apple, Banana banana, string? color = default)
+        [JsonConstructor]
+        public GmFruit(Apple? apple, Banana? banana, string cultivar, decimal lengthCm, string origin, string color)
         {
             Apple = Apple;
             Banana = Banana;
+            Cultivar = cultivar;
+            LengthCm = lengthCm;
+            Origin = origin;
             Color = color;
+            OnCreated();
         }
+
+        partial void OnCreated();
 
         /// <summary>
         /// Gets or Sets Apple
@@ -52,13 +61,31 @@ namespace Org.OpenAPITools.Model
         /// <summary>
         /// Gets or Sets Banana
         /// </summary>
-        public Banana Banana { get; set; }
+        public Banana? Banana { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Cultivar
+        /// </summary>
+        [JsonPropertyName("cultivar")]
+        public string Cultivar { get; set; }
+
+        /// <summary>
+        /// Gets or Sets LengthCm
+        /// </summary>
+        [JsonPropertyName("lengthCm")]
+        public decimal LengthCm { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Origin
+        /// </summary>
+        [JsonPropertyName("origin")]
+        public string Origin { get; set; }
 
         /// <summary>
         /// Gets or Sets Color
         /// </summary>
         [JsonPropertyName("color")]
-        public string? Color { get; set; }
+        public string Color { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -69,45 +96,11 @@ namespace Org.OpenAPITools.Model
             StringBuilder sb = new StringBuilder();
             sb.Append("class GmFruit {\n");
             sb.Append("  Color: ").Append(Color).Append("\n");
+            sb.Append("  Cultivar: ").Append(Cultivar).Append("\n");
+            sb.Append("  LengthCm: ").Append(LengthCm).Append("\n");
+            sb.Append("  Origin: ").Append(Origin).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns true if objects are equal
-        /// </summary>
-        /// <param name="input">Object to be compared</param>
-        /// <returns>Boolean</returns>
-        public override bool Equals(object? input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input as GmFruit).AreEqual;
-        }
-
-        /// <summary>
-        /// Returns true if GmFruit instances are equal
-        /// </summary>
-        /// <param name="input">Instance of GmFruit to be compared</param>
-        /// <returns>Boolean</returns>
-        public bool Equals(GmFruit? input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input).AreEqual;
-        }
-
-        /// <summary>
-        /// Gets the hash code
-        /// </summary>
-        /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
-            unchecked // Overflow is fine, just wrap
-            {
-                int hashCode = 41;
-                if (this.Color != null)
-                {
-                    hashCode = (hashCode * 59) + this.Color.GetHashCode();
-                }
-                return hashCode;
-            }
         }
 
         /// <summary>
@@ -115,76 +108,129 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
+            // Cultivar (string) pattern
+            Regex regexCultivar = new Regex(@"^[a-zA-Z\s]*$", RegexOptions.CultureInvariant);
+            if (false == regexCultivar.Match(this.Cultivar).Success)
+            {
+                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for Cultivar, must match a pattern of " + regexCultivar, new [] { "Cultivar" });
+            }
+
+            // Origin (string) pattern
+            Regex regexOrigin = new Regex(@"^[A-Z\s]*$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            if (false == regexOrigin.Match(this.Origin).Success)
+            {
+                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for Origin, must match a pattern of " + regexOrigin, new [] { "Origin" });
+            }
+
             yield break;
         }
     }
 
     /// <summary>
-    /// A Json converter for type GmFruit
+    /// A Json converter for type <see cref="GmFruit" />
     /// </summary>
     public class GmFruitJsonConverter : JsonConverter<GmFruit>
     {
         /// <summary>
-        /// Returns a boolean if the type is compatible with this converter.
+        /// Deserializes json to <see cref="GmFruit" />
         /// </summary>
+        /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type typeToConvert) => typeof(GmFruit).IsAssignableFrom(typeToConvert);
-
-        /// <summary>
-        /// A Json reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="typeToConvert"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <returns></returns>
         /// <exception cref="JsonException"></exception>
-        public override GmFruit Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override GmFruit Read(ref Utf8JsonReader utf8JsonReader, Type typeToConvert, JsonSerializerOptions jsonSerializerOptions)
         {
-            int currentDepth = reader.CurrentDepth;
+            int currentDepth = utf8JsonReader.CurrentDepth;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (utf8JsonReader.TokenType != JsonTokenType.StartObject && utf8JsonReader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            Utf8JsonReader appleReader = reader;
-            bool appleDeserialized = Client.ClientUtils.TryDeserialize<Apple>(ref appleReader, options, out Apple? apple);
+            JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
-            Utf8JsonReader bananaReader = reader;
-            bool bananaDeserialized = Client.ClientUtils.TryDeserialize<Banana>(ref bananaReader, options, out Banana? banana);
+            Utf8JsonReader appleReader = utf8JsonReader;
+            bool appleDeserialized = Client.ClientUtils.TryDeserialize<Apple>(ref appleReader, jsonSerializerOptions, out Apple? apple);
 
+            Utf8JsonReader bananaReader = utf8JsonReader;
+            bool bananaDeserialized = Client.ClientUtils.TryDeserialize<Banana>(ref bananaReader, jsonSerializerOptions, out Banana? banana);
+
+            string? cultivar = default;
+            decimal? lengthCm = default;
+            string? origin = default;
             string? color = default;
 
-            while (reader.Read())
+            while (utf8JsonReader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject && currentDepth == reader.CurrentDepth)
+                if (startingTokenType == JsonTokenType.StartObject && utf8JsonReader.TokenType == JsonTokenType.EndObject && currentDepth == utf8JsonReader.CurrentDepth)
                     break;
 
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                if (startingTokenType == JsonTokenType.StartArray && utf8JsonReader.TokenType == JsonTokenType.EndArray && currentDepth == utf8JsonReader.CurrentDepth)
+                    break;
+
+                if (utf8JsonReader.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReader.CurrentDepth - 1)
                 {
-                    string? propertyName = reader.GetString();
-                    reader.Read();
+                    string? propertyName = utf8JsonReader.GetString();
+                    utf8JsonReader.Read();
 
                     switch (propertyName)
                     {
+                        case "cultivar":
+                            cultivar = utf8JsonReader.GetString();
+                            break;
+                        case "lengthCm":
+                            if (utf8JsonReader.TokenType != JsonTokenType.Null)
+                                lengthCm = utf8JsonReader.GetDecimal();
+                            break;
+                        case "origin":
+                            origin = utf8JsonReader.GetString();
+                            break;
                         case "color":
-                            color = reader.GetString();
+                            color = utf8JsonReader.GetString();
+                            break;
+                        default:
                             break;
                     }
                 }
             }
 
-            return new GmFruit(apple, banana, color);
+            if (cultivar == null)
+                throw new ArgumentNullException(nameof(cultivar), "Property is required for class GmFruit.");
+
+            if (lengthCm == null)
+                throw new ArgumentNullException(nameof(lengthCm), "Property is required for class GmFruit.");
+
+            if (origin == null)
+                throw new ArgumentNullException(nameof(origin), "Property is required for class GmFruit.");
+
+            if (color == null)
+                throw new ArgumentNullException(nameof(color), "Property is required for class GmFruit.");
+
+            return new GmFruit(apple, banana, cultivar, lengthCm.Value, origin, color);
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="GmFruit" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="gmFruit"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public override void Write(Utf8JsonWriter writer, GmFruit gmFruit, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, GmFruit gmFruit, JsonSerializerOptions jsonSerializerOptions)
+        {
+            System.Text.Json.JsonSerializer.Serialize(writer, gmFruit.Apple, jsonSerializerOptions);
+
+            System.Text.Json.JsonSerializer.Serialize(writer, gmFruit.Banana, jsonSerializerOptions);
+
+            writer.WriteStartObject();
+
+            writer.WriteString("cultivar", gmFruit.Cultivar);
+            writer.WriteNumber("lengthCm", gmFruit.LengthCm);
+            writer.WriteString("origin", gmFruit.Origin);
+            writer.WriteString("color", gmFruit.Color);
+
+            writer.WriteEndObject();
+        }
     }
 }

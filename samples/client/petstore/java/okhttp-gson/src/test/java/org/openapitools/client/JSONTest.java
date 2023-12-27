@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -112,7 +113,7 @@ public class JSONTest {
             // OK
         }
         try {
-            // unexpected miliseconds
+            // unexpected milliseconds
             json.deserialize("\"2015-11-07T03:49:09.000Z\"", Date.class);
             fail("json parsing should fail");
         } catch (RuntimeException e) {
@@ -544,6 +545,19 @@ public class JSONTest {
         }
     }
 
+
+    /**
+     * Test validateJsonObject with null object
+     */
+    @Test
+    public void testValidateJsonObject() throws Exception {
+        JsonObject jsonObject = new JsonObject();
+        Exception exception = assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            Pet.validateJsonObject(jsonObject);
+        });
+        assertEquals(exception.getMessage(), "The required field `photoUrls` is not found in the JSON string: {}");
+    }
+
     /**
      * Test additional properties.
      */
@@ -559,5 +573,20 @@ public class JSONTest {
         t.setName("just a tag");
         z.putAdditionalProperty("new_object", t);
         assertEquals(z.toJson(), "{\"type\":\"plains\",\"className\":\"zebra\",\"new_key\":\"new_value\",\"new_boolean\":true,\"new_object\":{\"id\":34,\"name\":\"just a tag\"},\"from_json\":4567,\"from_json_map\":{\"nested_string\":\"nested_value\"},\"new_number\":1.23}");
+    }
+
+    /**
+     * Test the default value in array properties.
+     */
+    @Test
+    public void testDefaultValue() throws Exception {
+        // None of these should throw exceptions due to the list being null
+        // as the add*Itme method should initialise an empty list if it's set
+        // to null
+        ArrayDefault ad = new ArrayDefault();
+        ad = ad.withDefaultEmptyBracket(null);
+        ad.addWithDefaultEmptyBracketItem("test");
+        ad = ad.withoutDefault(null);
+        ad.addWithoutDefaultItem("hello world");
     }
 }

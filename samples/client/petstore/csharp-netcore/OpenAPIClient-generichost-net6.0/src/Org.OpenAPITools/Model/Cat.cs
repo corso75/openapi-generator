@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
@@ -27,30 +26,28 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// Cat
     /// </summary>
-    public partial class Cat : Animal, IEquatable<Cat>
+    public partial class Cat : Animal, IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Cat" /> class.
         /// </summary>
-        /// <param name="dictionary"></param>
-        /// <param name="catAllOf"></param>
-        /// <param name="className">className (required)</param>
+        /// <param name="className">className</param>
+        /// <param name="declawed">declawed</param>
         /// <param name="color">color (default to &quot;red&quot;)</param>
-        public Cat(Dictionary<string, int> dictionary, CatAllOf catAllOf, string className, string color = "red") : base(className, color)
+        [JsonConstructor]
+        public Cat(string className, bool declawed, string color = @"red") : base(className, color)
         {
-            Dictionary = dictionary;
-            CatAllOf = catAllOf;
+            Declawed = declawed;
+            OnCreated();
         }
 
-        /// <summary>
-        /// Gets or Sets Dictionary
-        /// </summary>
-        public Dictionary<string, int> Dictionary { get; set; }
+        partial void OnCreated();
 
         /// <summary>
-        /// Gets or Sets CatAllOf
+        /// Gets or Sets Declawed
         /// </summary>
-        public CatAllOf CatAllOf { get; set; }
+        [JsonPropertyName("declawed")]
+        public bool Declawed { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -60,114 +57,98 @@ namespace Org.OpenAPITools.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class Cat {\n");
-            sb.Append("  ").Append(base.ToString().Replace("\n", "\n  ")).Append("\n");
+            sb.Append("  ").Append(base.ToString()?.Replace("\n", "\n  ")).Append("\n");
+            sb.Append("  Declawed: ").Append(Declawed).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
-
-        /// <summary>
-        /// Returns true if objects are equal
-        /// </summary>
-        /// <param name="input">Object to be compared</param>
-        /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input as Cat).AreEqual;
-        }
-
-        /// <summary>
-        /// Returns true if Cat instances are equal
-        /// </summary>
-        /// <param name="input">Instance of Cat to be compared</param>
-        /// <returns>Boolean</returns>
-        public bool Equals(Cat input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input).AreEqual;
-        }
-
-        /// <summary>
-        /// Gets the hash code
-        /// </summary>
-        /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
-            unchecked // Overflow is fine, just wrap
-            {
-                int hashCode = base.GetHashCode();
-                return hashCode;
-            }
-        }
-
     }
 
     /// <summary>
-    /// A Json converter for type Cat
+    /// A Json converter for type <see cref="Cat" />
     /// </summary>
     public class CatJsonConverter : JsonConverter<Cat>
     {
         /// <summary>
-        /// Returns a boolean if the type is compatible with this converter.
+        /// Deserializes json to <see cref="Cat" />
         /// </summary>
+        /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type typeToConvert) => typeof(Cat).IsAssignableFrom(typeToConvert);
-
-        /// <summary>
-        /// A Json reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="typeToConvert"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <returns></returns>
         /// <exception cref="JsonException"></exception>
-        public override Cat Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Cat Read(ref Utf8JsonReader utf8JsonReader, Type typeToConvert, JsonSerializerOptions jsonSerializerOptions)
         {
-            int currentDepth = reader.CurrentDepth;
+            int currentDepth = utf8JsonReader.CurrentDepth;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (utf8JsonReader.TokenType != JsonTokenType.StartObject && utf8JsonReader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            Utf8JsonReader dictionaryReader = reader;
-            bool dictionaryDeserialized = Client.ClientUtils.TryDeserialize<Dictionary<string, int>>(ref dictionaryReader, options, out Dictionary<string, int> dictionary);
-
-            Utf8JsonReader catAllOfReader = reader;
-            bool catAllOfDeserialized = Client.ClientUtils.TryDeserialize<CatAllOf>(ref catAllOfReader, options, out CatAllOf catAllOf);
+            JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
             string className = default;
+            bool? declawed = default;
             string color = default;
 
-            while (reader.Read())
+            while (utf8JsonReader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject && currentDepth == reader.CurrentDepth)
+                if (startingTokenType == JsonTokenType.StartObject && utf8JsonReader.TokenType == JsonTokenType.EndObject && currentDepth == utf8JsonReader.CurrentDepth)
                     break;
 
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                if (startingTokenType == JsonTokenType.StartArray && utf8JsonReader.TokenType == JsonTokenType.EndArray && currentDepth == utf8JsonReader.CurrentDepth)
+                    break;
+
+                if (utf8JsonReader.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReader.CurrentDepth - 1)
                 {
-                    string propertyName = reader.GetString();
-                    reader.Read();
+                    string propertyName = utf8JsonReader.GetString();
+                    utf8JsonReader.Read();
 
                     switch (propertyName)
                     {
                         case "className":
-                            className = reader.GetString();
+                            className = utf8JsonReader.GetString();
+                            break;
+                        case "declawed":
+                            if (utf8JsonReader.TokenType != JsonTokenType.Null)
+                                declawed = utf8JsonReader.GetBoolean();
                             break;
                         case "color":
-                            color = reader.GetString();
+                            color = utf8JsonReader.GetString();
+                            break;
+                        default:
                             break;
                     }
                 }
             }
 
-            return new Cat(dictionary, catAllOf, className, color);
+            if (className == null)
+                throw new ArgumentNullException(nameof(className), "Property is required for class Cat.");
+
+            if (declawed == null)
+                throw new ArgumentNullException(nameof(declawed), "Property is required for class Cat.");
+
+            if (color == null)
+                throw new ArgumentNullException(nameof(color), "Property is required for class Cat.");
+
+            return new Cat(className, declawed.Value, color);
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="Cat" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="cat"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public override void Write(Utf8JsonWriter writer, Cat cat, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, Cat cat, JsonSerializerOptions jsonSerializerOptions)
+        {
+            writer.WriteStartObject();
+
+            writer.WriteString("className", cat.ClassName);
+            writer.WriteBoolean("declawed", cat.Declawed);
+            writer.WriteString("color", cat.Color);
+
+            writer.WriteEndObject();
+        }
     }
 }

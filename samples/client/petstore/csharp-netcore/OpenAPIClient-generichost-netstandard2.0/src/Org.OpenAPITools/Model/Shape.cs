@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
@@ -27,35 +26,43 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// Shape
     /// </summary>
-    public partial class Shape : IEquatable<Shape>, IValidatableObject
+    public partial class Shape : IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape" /> class.
         /// </summary>
         /// <param name="triangle"></param>
-        /// <param name="quadrilateralType">quadrilateralType (required)</param>
-        public Shape(Triangle triangle, string quadrilateralType)
+        /// <param name="quadrilateralType">quadrilateralType</param>
+        /// <param name="shapeType">shapeType</param>
+        /// <param name="triangleType">triangleType</param>
+        [JsonConstructor]
+        public Shape(Triangle triangle, string quadrilateralType, string shapeType, string triangleType)
         {
-            if (quadrilateralType == null)
-                throw new ArgumentNullException("quadrilateralType is a required property for Shape and cannot be null.");
-
             Triangle = triangle;
             QuadrilateralType = quadrilateralType;
+            ShapeType = shapeType;
+            TriangleType = triangleType;
+            OnCreated();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape" /> class.
         /// </summary>
         /// <param name="quadrilateral"></param>
-        /// <param name="quadrilateralType">quadrilateralType (required)</param>
-        public Shape(Quadrilateral quadrilateral, string quadrilateralType)
+        /// <param name="quadrilateralType">quadrilateralType</param>
+        /// <param name="shapeType">shapeType</param>
+        /// <param name="triangleType">triangleType</param>
+        [JsonConstructor]
+        public Shape(Quadrilateral quadrilateral, string quadrilateralType, string shapeType, string triangleType)
         {
-            if (quadrilateralType == null)
-                throw new ArgumentNullException("quadrilateralType is a required property for Shape and cannot be null.");
-
             Quadrilateral = quadrilateral;
             QuadrilateralType = quadrilateralType;
+            ShapeType = shapeType;
+            TriangleType = triangleType;
+            OnCreated();
         }
+
+        partial void OnCreated();
 
         /// <summary>
         /// Gets or Sets Triangle
@@ -74,10 +81,22 @@ namespace Org.OpenAPITools.Model
         public string QuadrilateralType { get; set; }
 
         /// <summary>
+        /// Gets or Sets ShapeType
+        /// </summary>
+        [JsonPropertyName("shapeType")]
+        public string ShapeType { get; set; }
+
+        /// <summary>
+        /// Gets or Sets TriangleType
+        /// </summary>
+        [JsonPropertyName("triangleType")]
+        public string TriangleType { get; set; }
+
+        /// <summary>
         /// Gets or Sets additional properties
         /// </summary>
         [JsonExtensionData]
-        public Dictionary<string, JsonElement> AdditionalProperties { get; set; } = new Dictionary<string, JsonElement>();
+        public Dictionary<string, JsonElement> AdditionalProperties { get; } = new Dictionary<string, JsonElement>();
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -88,50 +107,10 @@ namespace Org.OpenAPITools.Model
             StringBuilder sb = new StringBuilder();
             sb.Append("class Shape {\n");
             sb.Append("  QuadrilateralType: ").Append(QuadrilateralType).Append("\n");
+            sb.Append("  ShapeType: ").Append(ShapeType).Append("\n");
             sb.Append("  AdditionalProperties: ").Append(AdditionalProperties).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Returns true if objects are equal
-        /// </summary>
-        /// <param name="input">Object to be compared</param>
-        /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input as Shape).AreEqual;
-        }
-
-        /// <summary>
-        /// Returns true if Shape instances are equal
-        /// </summary>
-        /// <param name="input">Instance of Shape to be compared</param>
-        /// <returns>Boolean</returns>
-        public bool Equals(Shape input)
-        {
-            return OpenAPIClientUtils.compareLogic.Compare(this, input).AreEqual;
-        }
-
-        /// <summary>
-        /// Gets the hash code
-        /// </summary>
-        /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
-            unchecked // Overflow is fine, just wrap
-            {
-                int hashCode = 41;
-                if (this.QuadrilateralType != null)
-                {
-                    hashCode = (hashCode * 59) + this.QuadrilateralType.GetHashCode();
-                }
-                if (this.AdditionalProperties != null)
-                {
-                    hashCode = (hashCode * 59) + this.AdditionalProperties.GetHashCode();
-                }
-                return hashCode;
-            }
         }
 
         /// <summary>
@@ -139,7 +118,7 @@ namespace Org.OpenAPITools.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
             return this.BaseValidate(validationContext);
         }
@@ -156,75 +135,101 @@ namespace Org.OpenAPITools.Model
     }
 
     /// <summary>
-    /// A Json converter for type Shape
+    /// A Json converter for type <see cref="Shape" />
     /// </summary>
     public class ShapeJsonConverter : JsonConverter<Shape>
     {
         /// <summary>
-        /// Returns a boolean if the type is compatible with this converter.
+        /// Deserializes json to <see cref="Shape" />
         /// </summary>
+        /// <param name="utf8JsonReader"></param>
         /// <param name="typeToConvert"></param>
-        /// <returns></returns>
-        public override bool CanConvert(Type typeToConvert) => typeof(Shape).IsAssignableFrom(typeToConvert);
-
-        /// <summary>
-        /// A Json reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="typeToConvert"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <returns></returns>
         /// <exception cref="JsonException"></exception>
-        public override Shape Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Shape Read(ref Utf8JsonReader utf8JsonReader, Type typeToConvert, JsonSerializerOptions jsonSerializerOptions)
         {
-            int currentDepth = reader.CurrentDepth;
+            int currentDepth = utf8JsonReader.CurrentDepth;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (utf8JsonReader.TokenType != JsonTokenType.StartObject && utf8JsonReader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            Utf8JsonReader triangleReader = reader;
-            bool triangleDeserialized = Client.ClientUtils.TryDeserialize<Triangle>(ref triangleReader, options, out Triangle triangle);
-
-            Utf8JsonReader quadrilateralReader = reader;
-            bool quadrilateralDeserialized = Client.ClientUtils.TryDeserialize<Quadrilateral>(ref quadrilateralReader, options, out Quadrilateral quadrilateral);
+            JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
             string quadrilateralType = default;
+            string shapeType = default;
+            string triangleType = default;
 
-            while (reader.Read())
+            while (utf8JsonReader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject && currentDepth == reader.CurrentDepth)
+                if (startingTokenType == JsonTokenType.StartObject && utf8JsonReader.TokenType == JsonTokenType.EndObject && currentDepth == utf8JsonReader.CurrentDepth)
                     break;
 
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                if (startingTokenType == JsonTokenType.StartArray && utf8JsonReader.TokenType == JsonTokenType.EndArray && currentDepth == utf8JsonReader.CurrentDepth)
+                    break;
+
+                if (utf8JsonReader.TokenType == JsonTokenType.PropertyName && currentDepth == utf8JsonReader.CurrentDepth - 1)
                 {
-                    string propertyName = reader.GetString();
-                    reader.Read();
+                    string propertyName = utf8JsonReader.GetString();
+                    utf8JsonReader.Read();
 
                     switch (propertyName)
                     {
                         case "quadrilateralType":
-                            quadrilateralType = reader.GetString();
+                            quadrilateralType = utf8JsonReader.GetString();
+                            break;
+                        case "shapeType":
+                            shapeType = utf8JsonReader.GetString();
+                            break;
+                        case "triangleType":
+                            triangleType = utf8JsonReader.GetString();
+                            break;
+                        default:
                             break;
                     }
                 }
             }
 
-            if (triangleDeserialized)
-                return new Shape(triangle, quadrilateralType);
+            if (quadrilateralType == null)
+                throw new ArgumentNullException(nameof(quadrilateralType), "Property is required for class Shape.");
 
-            if (quadrilateralDeserialized)
-                return new Shape(quadrilateral, quadrilateralType);
+            if (shapeType == null)
+                throw new ArgumentNullException(nameof(shapeType), "Property is required for class Shape.");
+
+            if (triangleType == null)
+                throw new ArgumentNullException(nameof(triangleType), "Property is required for class Shape.");
+
+            Utf8JsonReader triangleReader = utf8JsonReader;
+            if (Client.ClientUtils.TryDeserialize<Triangle>(ref triangleReader, jsonSerializerOptions, out Triangle triangle))
+                return new Shape(triangle, quadrilateralType, shapeType, triangleType);
+
+            Utf8JsonReader quadrilateralReader = utf8JsonReader;
+            if (Client.ClientUtils.TryDeserialize<Quadrilateral>(ref quadrilateralReader, jsonSerializerOptions, out Quadrilateral quadrilateral))
+                return new Shape(quadrilateral, quadrilateralType, shapeType, triangleType);
 
             throw new JsonException();
         }
 
         /// <summary>
-        /// A Json writer
+        /// Serializes a <see cref="Shape" />
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="shape"></param>
-        /// <param name="options"></param>
+        /// <param name="jsonSerializerOptions"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public override void Write(Utf8JsonWriter writer, Shape shape, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, Shape shape, JsonSerializerOptions jsonSerializerOptions)
+        {
+            System.Text.Json.JsonSerializer.Serialize(writer, shape.Triangle, jsonSerializerOptions);
+
+            System.Text.Json.JsonSerializer.Serialize(writer, shape.Quadrilateral, jsonSerializerOptions);
+
+            writer.WriteStartObject();
+
+            writer.WriteString("quadrilateralType", shape.QuadrilateralType);
+            writer.WriteString("shapeType", shape.ShapeType);
+            writer.WriteString("triangleType", shape.TriangleType);
+
+            writer.WriteEndObject();
+        }
     }
 }
