@@ -14,6 +14,7 @@ Method | HTTP request | Description
 
 ### Example
 
+
 ```python
 import time
 import os
@@ -43,7 +44,9 @@ async with petstore_api.ApiClient(configuration) as api_client:
 ```
 
 
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
@@ -60,6 +63,7 @@ No authorization required
  - **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **0** | response |  -  |

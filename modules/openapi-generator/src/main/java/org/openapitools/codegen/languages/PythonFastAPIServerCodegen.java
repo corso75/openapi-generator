@@ -214,7 +214,7 @@ public class PythonFastAPIServerCodegen extends AbstractPythonCodegen {
             Schema inner = ap.getItems();
             return getSchemaType(p) + "[" + getTypeDeclaration(inner) + "]";
         } else if (ModelUtils.isMapSchema(p)) {
-            Schema inner = getAdditionalProperties(p);
+            Schema inner = ModelUtils.getAdditionalProperties(p);
             return getSchemaType(p) + "[str, " + getTypeDeclaration(inner) + "]";
         }
         return super.getTypeDeclaration(p);
@@ -319,12 +319,6 @@ public class PythonFastAPIServerCodegen extends AbstractPythonCodegen {
         System.out.println("# This generator's contributed by Nikita Vakula (https://github.com/krjakbrjak)#");
         System.out.println("# Please support his work directly via https://paypal.me/krjakbrjak  \uD83D\uDE4F        #");
         System.out.println("################################################################################");
-    }
-
-    @Override
-    public String toRegularExpression(String pattern) {
-        String regex = super.toRegularExpression(pattern);
-        return StringUtils.substring(regex, 1, -1);
     }
 
     @Override
