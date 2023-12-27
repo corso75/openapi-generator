@@ -6,12 +6,11 @@ from typing import Union
 
 from openapi_server.models.user import User  # noqa: E501
 from openapi_server import util
+from openapi_server.controllers.internal.i_user_controller import *
 
 
 def create_user(body):  # noqa: E501
     """Create user
-
-    This can only be done by the logged in user. # noqa: E501
 
     :param body: Created user object
     :type body: dict | bytes
@@ -20,14 +19,12 @@ def create_user(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = User.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    return i_create_user(body)
 
 
 def create_users_with_array_input(body):  # noqa: E501
     """Creates list of users with given input array
 
-     # noqa: E501
-
     :param body: List of user object
     :type body: list | bytes
 
@@ -35,14 +32,12 @@ def create_users_with_array_input(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = [User.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    return 'do some magic!'
+    return i_create_users_with_array_input(body)
 
 
 def create_users_with_list_input(body):  # noqa: E501
     """Creates list of users with given input array
 
-     # noqa: E501
-
     :param body: List of user object
     :type body: list | bytes
 
@@ -50,39 +45,33 @@ def create_users_with_list_input(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = [User.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    return 'do some magic!'
+    return i_create_users_with_list_input(body)
 
 
 def delete_user(username):  # noqa: E501
     """Delete user
-
-    This can only be done by the logged in user. # noqa: E501
 
     :param username: The name that needs to be deleted
     :type username: str
 
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    return i_delete_user(username)
 
 
 def get_user_by_name(username):  # noqa: E501
     """Get user by user name
-
-     # noqa: E501
 
     :param username: The name that needs to be fetched. Use user1 for testing.
     :type username: str
 
     :rtype: Union[User, Tuple[User, int], Tuple[User, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    return i_get_user_by_name(username)
 
 
 def login_user(username, password):  # noqa: E501
     """Logs user into the system
-
-     # noqa: E501
 
     :param username: The user name for login
     :type username: str
@@ -91,24 +80,20 @@ def login_user(username, password):  # noqa: E501
 
     :rtype: Union[str, Tuple[str, int], Tuple[str, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    return i_login_user(username, password)
 
 
 def logout_user():  # noqa: E501
     """Logs out current logged in user session
 
-     # noqa: E501
-
 
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    return i_logout_user()
 
 
 def update_user(username, body):  # noqa: E501
     """Updated user
-
-    This can only be done by the logged in user. # noqa: E501
 
     :param username: name that need to be deleted
     :type username: str
@@ -119,4 +104,4 @@ def update_user(username, body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = User.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    return i_update_user(username, body)
