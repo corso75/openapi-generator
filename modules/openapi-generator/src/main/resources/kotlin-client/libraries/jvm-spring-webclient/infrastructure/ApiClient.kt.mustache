@@ -1,5 +1,6 @@
 package {{packageName}}.infrastructure;
 
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -13,7 +14,7 @@ open class ApiClient(protected val client: WebClient) {
     protected inline fun <reified I : Any, reified T: Any?> request(requestConfig: RequestConfig<I>): Mono<ResponseEntity<T>> {
         return prepare(defaults(requestConfig))
             .retrieve()
-            .toEntity(T::class.java)
+            .toEntity(object : ParameterizedTypeReference<T>() {})
     }
 
     protected fun <I : Any> prepare(requestConfig: RequestConfig<I>) =
@@ -53,3 +54,20 @@ open class ApiClient(protected val client: WebClient) {
     private fun <I : Any> WebClient.RequestBodySpec.body(requestConfig: RequestConfig<I>) =
         apply { if (requestConfig.body != null) bodyValue(requestConfig.body) }
 }
+
+inline fun <reified T: Any> parseDateToQueryString(value : T): String {
+        {{#toJson}}
+        /*
+        .replace("\"", "") converts the json object string to an actual string for the query parameter.
+        The moshi or gson adapter allows a more generic solution instead of trying to use a native
+        formatter. It also easily allows to provide a simple way to define a custom date format pattern
+        inside a gson/moshi adapter.
+        */
+        {{#jackson}}
+        return Serializer.jacksonObjectMapper.writeValueAsString(value).replace("\"", "")
+        {{/jackson}}
+        {{/toJson}}
+        {{^toJson}}
+        return value.toString()
+        {{/toJson}}
+    }

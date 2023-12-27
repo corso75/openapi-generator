@@ -69,12 +69,14 @@ docs/OuterEnumInteger.md
 docs/OuterEnumIntegerDefaultValue.md
 docs/Pet.md
 docs/PetAPI.md
+docs/PropertyNameMapping.md
 docs/ReadOnlyFirst.md
 docs/ReadOnlyWithDefault.md
 docs/Return.md
 docs/SpecialModelName.md
 docs/StoreAPI.md
 docs/Tag.md
+docs/TestInlineFreeformAdditionalPropertiesRequest.md
 docs/User.md
 docs/UserAPI.md
 docs/Whale.md
@@ -136,10 +138,12 @@ model_outer_enum_default_value.go
 model_outer_enum_integer.go
 model_outer_enum_integer_default_value.go
 model_pet.go
+model_property_name_mapping.go
 model_read_only_first.go
 model_read_only_with_default.go
 model_return.go
 model_tag.go
+model_test_inline_freeform_additional_properties_request.go
 model_user.go
 model_whale.go
 model_zebra.go

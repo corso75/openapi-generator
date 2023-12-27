@@ -1,6 +1,5 @@
 /*
  * Copyright 2018 OpenAPI-Generator Contributors (https://openapi-generator.tech)
- * Copyright 2018 SmartBear Software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,7 +294,7 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
         } else if (ModelUtils.isMapSchema(target)) {
             // Note: ModelUtils.isMapSchema(p) returns true when p is a composed schema that also defines
             // additionalproperties: true
-            Schema<?> inner = getAdditionalProperties(target);
+            Schema<?> inner = ModelUtils.getAdditionalProperties(target);
             if (inner == null) {
                 LOGGER.error("`{}` (map property) does not have a proper inner type defined. Default to type:string", p.getName());
                 inner = new StringSchema().description("TODO default missing map inner type to string");
@@ -303,7 +302,7 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
             }
             return "[String: " + getTypeDeclaration(inner) + "]";
         } else if (ModelUtils.isComposedSchema(target)) {
-            List<Schema> schemas = ModelUtils.getInterfaces((ComposedSchema)target);
+            List<Schema> schemas = ModelUtils.getInterfaces((ComposedSchema) target);
             if (schemas.size() == 1) {
                 return getTypeDeclaration(schemas.get(0));
             } else {
@@ -396,11 +395,7 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
     public String toDefaultValue(Schema p) {
         if (p.getEnum() != null && !p.getEnum().isEmpty()) {
             if (p.getDefault() != null) {
-                if (ModelUtils.isStringSchema(p)) {
-                    return "." + toEnumVarName(escapeText((String) p.getDefault()), p.getType());
-                } else {
-                    return "." + toEnumVarName(escapeText(p.getDefault().toString()), p.getType());
-                }
+                return "." + toEnumVarName(escapeText(String.valueOf(p.getDefault())), p.getType());
             }
         }
         if (p.getDefault() != null) {
@@ -413,9 +408,9 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
                 long epochMicro = TimeUnit.SECONDS.toMicros(instant.getEpochSecond()) + (instant.get(ChronoField.MICRO_OF_SECOND));
                 return "Date(timeIntervalSince1970: " + String.valueOf(epochMicro) + ".0 / 1_000_000)";
             } else if (ModelUtils.isUUIDSchema(p)) {
-                return "\"" + escapeText(p.getDefault().toString()) + "\"";
+                return "\"" + escapeText(String.valueOf(p.getDefault())) + "\"";
             } else if (ModelUtils.isStringSchema(p)) {
-                return "\"" + escapeText((String) p.getDefault()) + "\"";
+                return "\"" + escapeText(String.valueOf(p.getDefault())) + "\"";
             }
             // TODO: Handle more cases from `ModelUtils`, such as Date
         }
@@ -425,7 +420,7 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
     @Override
     public String toInstantiationType(Schema p) {
         if (ModelUtils.isMapSchema(p)) {
-            return getSchemaType(getAdditionalProperties(p));
+            return getSchemaType(ModelUtils.getAdditionalProperties(p));
         } else if (ModelUtils.isArraySchema(p)) {
             ArraySchema ap = (ArraySchema) p;
             String inner = getSchemaType(ap.getItems());
@@ -562,6 +557,7 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
+
     @Override
     public String toEnumValue(String value, String datatype) {
         // for string, array of string
@@ -579,6 +575,10 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
 
     @Override
     public String toEnumVarName(String name, String datatype) {
+        if (enumNameMapping.containsKey(name)) {
+            return enumNameMapping.get(name);
+        }
+
         if (name.length() == 0) {
             return "empty";
         }
@@ -634,6 +634,10 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
 
     @Override
     public String toEnumName(CodegenProperty property) {
+        if (enumNameMapping.containsKey(property.name)) {
+            return enumNameMapping.get(property.name);
+        }
+
         String enumName = toModelName(property.name);
 
         // Ensure that the enum type doesn't match a reserved word or
@@ -804,7 +808,9 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
     }
 
     @Override
-    public GeneratorLanguage generatorLanguage() { return GeneratorLanguage.SWIFT; }
+    public GeneratorLanguage generatorLanguage() {
+        return GeneratorLanguage.SWIFT;
+    }
 
     protected void addAnyDecoderIfNeeded() {
         if (!anyDecoderWasAdded) {

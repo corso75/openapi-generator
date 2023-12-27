@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public interface UserApiDelegate {
      * @return successful operation (status code 200)
      * @see UserApi#createUsersWithArrayInput
      */
-    default void createUsersWithArrayInput(List<User> user) {
+    default void createUsersWithArrayInput(List<@Valid User> user) {
         throw new IllegalArgumentException("Not implemented");
 
     }
@@ -58,7 +59,7 @@ public interface UserApiDelegate {
      * @return successful operation (status code 200)
      * @see UserApi#createUsersWithListInput
      */
-    default void createUsersWithListInput(List<User> user) {
+    default void createUsersWithListInput(List<@Valid User> user) {
         throw new IllegalArgumentException("Not implemented");
 
     }

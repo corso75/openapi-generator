@@ -29,8 +29,8 @@ class FakeBigDecimalMap200Response {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is FakeBigDecimalMap200Response &&
-     other.someId == someId &&
-     other.someMap == someMap;
+    other.someId == someId &&
+    _deepEquality.equals(other.someMap, someMap);
 
   @override
   int get hashCode =>
@@ -71,9 +71,7 @@ class FakeBigDecimalMap200Response {
       }());
 
       return FakeBigDecimalMap200Response(
-        someId: json[r'someId'] == null
-            ? null
-            : num.parse(json[r'someId'].toString()),
+        someId: num.parse('${json[r'someId']}'),
         someMap: mapCastOfType<String, num>(json, r'someMap') ?? const {},
       );
     }

@@ -313,21 +313,6 @@ public class AspNetServerCodegen extends AbstractCSharpCodegen {
     }
 
     @Override
-    protected void setTypeMapping() {
-        super.setTypeMapping();
-        typeMapping.put("boolean", "bool");
-        typeMapping.put("integer", "int");
-        typeMapping.put("float", "float");
-        typeMapping.put("long", "long");
-        typeMapping.put("double", "double");
-        typeMapping.put("number", "decimal");
-        typeMapping.put("DateTime", "DateTime");
-        typeMapping.put("date", "DateTime");
-        typeMapping.put("UUID", "Guid");
-        typeMapping.put("URI", "string");
-    }
-
-    @Override
     public void postProcessParameter(CodegenParameter parameter) {
         super.postProcessParameter(parameter);
 
@@ -338,7 +323,7 @@ public class AspNetServerCodegen extends AbstractCSharpCodegen {
 
     @Override
     protected void updateCodegenParameterEnum(CodegenParameter parameter, CodegenModel model) {
-        super.updateCodegenParameterEnum(parameter, model);
+        super.updateCodegenParameterEnumLegacy(parameter, model);
 
         if (!parameter.required && parameter.vendorExtensions.get("x-csharp-value-type") != null) { //optional
             parameter.dataType = parameter.dataType + "?";
@@ -590,6 +575,15 @@ public class AspNetServerCodegen extends AbstractCSharpCodegen {
         return escapeText(pattern);
     }
 
+    @Override
+    protected void patchProperty(Map<String, CodegenModel> enumRefs, CodegenModel model, CodegenProperty property) {
+        super.patchProperty(enumRefs, model, property);
+
+        if (!property.isContainer && (this.getNullableTypes().contains(property.dataType) || property.isEnum)) {
+            property.vendorExtensions.put("x-csharp-value-type", true);
+        }
+    }
+
     @SuppressWarnings("rawtypes")
     @Override
     public String getNullableType(Schema p, String type) {
@@ -602,6 +596,11 @@ public class AspNetServerCodegen extends AbstractCSharpCodegen {
         } else {
             return null;
         }
+    }
+
+    @Override
+    protected void patchVendorExtensionNullableValueType(CodegenParameter parameter) {
+        super.patchVendorExtensionNullableValueTypeLegacy(parameter);
     }
 
     private void setCliOption(CliOption cliOption) throws IllegalArgumentException {

@@ -93,7 +93,8 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
                         SecurityFeature.BasicAuth,
                         SecurityFeature.BearerToken,
                         SecurityFeature.ApiKey,
-                        SecurityFeature.OAuth2_Implicit
+                        SecurityFeature.OAuth2_Implicit,
+                        SecurityFeature.AWSV4Signature
                 ))
                 .excludeGlobalFeatures(
                         GlobalFeature.XMLStructureDefinitions,
@@ -436,7 +437,7 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
             }
             return "Vec<" + getTypeDeclaration(inner) + ">";
         } else if (ModelUtils.isMapSchema(unaliasSchema)) {
-            Schema inner = getAdditionalProperties(unaliasSchema);
+            Schema inner = ModelUtils.getAdditionalProperties(unaliasSchema);
             if (inner == null) {
                 LOGGER.warn("{}(map property) does not have a proper inner type defined. Default to string", unaliasSchema.getName());
                 inner = new StringSchema().description("TODO default missing map inner type to string");
